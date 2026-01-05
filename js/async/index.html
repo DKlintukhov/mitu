@@ -7,10 +7,43 @@
     <title>Binance WebSocket Client</title>
 </head>
 <body>
-    <h1>Курсы Binance</h1>
-    <div id="status">Подключение...</div>
-    <div id="prices"></div>
+    <div class="wrapper">
+        <div>
+            <h1>Курсы Binance</h1>
+            <div id="status">Подключение...</div>
+        </div>
 
-    <script src="./script.js"></script>
+        <div id="prices"></div>
+    </div>
+
+    <script>
+        const ws = new WebSocket("ws://localhost:8080");
+        ws.onopen = () => {
+            document.getElementById("status").textContent = "Подключено!";
+        };
+        ws.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            const data = message.data;
+            const symbol = data.s.toLowerCase();
+            const price = parseFloat(data.c).toFixed(2);
+
+            let el = document.getElementById(symbol);
+            if (!el)
+            {
+                el = document.createElement("div");
+                el.id = symbol;
+                el.className = "price-item";
+                document.getElementById("prices").appendChild(el);
+            }
+
+            el.innerHTML = `<span class="symbol">${symbol.toUpperCase()} <span class="price"> $${price}</></>`;
+        };
+        ws.onclose = () => {
+            console.log("Соединение закрыто");
+        };
+        ws.onerror = (err) => {
+            console.error(err);
+        };
+    </script>
 </body>
 </html>

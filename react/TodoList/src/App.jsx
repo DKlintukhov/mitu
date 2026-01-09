@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
+import TaskInput from './TaskInput.jsx';
+import TaskList from './TaskList.jsx';
 import './App.css';
 
 function App() {
@@ -22,28 +24,12 @@ function App() {
     <>
       <div className="App">
         <h1>Мой список дел</h1>
-        <div className="input-container">
-          <input
-            type="text"
-            value={inputValue}
-            placeholder="Введите задачу"
-            onChange={(e) => setInputValue(e.target.value)}
-          />
-          <button onClick={handleAddTask}>Добавить</button>
-        </div>
-        <ul className="task-list">
-          {tasks.map((task) => (
-            <li key={task.id}>
-              <p>{task.text}</p>
-              <button
-                className="delete-btn"
-                onClick={() => handleDeleteTask(task.id)}
-              >
-                Удалить
-              </button>
-            </li>
-          ))}
-        </ul>
+        <TaskInput
+          inputValue={inputValue}
+          setInputValue={setInputValue}
+          onAddTask={handleAddTask}
+        />
+        <TaskList tasks={tasks} onDeleteTask={handleDeleteTask}/>
         <p>Задач: {tasks.length}</p>
       </div>
     </>

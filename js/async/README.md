@@ -6,7 +6,6 @@
 ## 2. Склонируйте репозиторий
 ```
 https://github.com/DKlintukhov/mitu.git
-cd mitu/js/async
 ```
 
 ## 3. Перейдите в директорию проекта

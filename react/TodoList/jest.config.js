@@ -1,7 +1,7 @@
 export default {
   testEnvironment: "jsdom",
   moduleNameMapper: {
-    "\\.(css|less|scss|sass)$": "identity-obj-proxy",
+    "\\.(css|less|scss|sass|svg)$": "identity-obj-proxy",
   },
   transform: {
     "^.+\\.[tj]sx?$": "babel-jest",

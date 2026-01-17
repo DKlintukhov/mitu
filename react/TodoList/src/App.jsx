@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import TaskInput from './TaskInput.jsx';
@@ -6,27 +6,71 @@ import TaskList from './TaskList.jsx';
 import './App.css';
 
 function App() {
+  const API_URL = "http://localhost:4000/api/tasks";
+  const API_KEY = "my-secret-key";
+
   const [tasks, setTasks] = useState([]);
   const [inputValue, setInputValue] = useState("");
 
-  const handleAddTask = () => {
+  useEffect(() => {
+    fetch(API_URL, {
+      headers: { "x-api-key": API_KEY },
+    }).then((res) => res.json())
+      .then(setTasks)
+      .catch((err) => console.error(err));
+  }), [];
+
+  const handleAddTask = async () => {
     if (inputValue.trim() === "") return;
 
-    setTasks([...tasks, { id: Date.now(), text: inputValue }]);
-    setInputValue("");
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": API_KEY,
+        },
+        body: JSON.stringify({ text: inputValue })
+      });
+      const newTask = await res.json();
+      setTasks((prev) => [...prev, newTask]);
+      setInputValue('');
+    } catch (err) {
+        console.error(err);
+    }
   };
 
-  const handleDeleteTask = (id) => {
-    setTasks(tasks.filter((task) => task.id !== id));
+  const handleDeleteTask = async (id) => {
+    try {
+      const res = await fetch(`${API_URL}/${id}`, {
+        method: 'DELETE',
+        headers: {
+          "x-api-key": API_KEY,
+        },
+      });
+      setTasks((prev) => prev.filter((task) => task.id !== id));
+    } catch (err) {
+        console.error(err);
+    }
   };
 
-  const handleUpdateTask = (id, newText) => {
+  const handleUpdateTask = async (id, newText) => {
     if (newText.trim() === "") return;
 
-    setTasks(tasks.map(task => {
-      if (task.id === id) return { ...task, text: newText };
-      return task;
-    }));
+    try {
+      const res = await fetch(`${API_URL}/${id}`, {
+        method: 'PUT',
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": API_KEY,
+        },
+        body: JSON.stringify({ text: newText }),
+      });
+      const updated = await res.json();
+      setTasks((prev) => prev.map((task) => (task.id === id ? updated : task)));
+    } catch (err) {
+        console.error(err);
+    }
   };
 
   return (

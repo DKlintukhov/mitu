@@ -13,12 +13,11 @@ function App() {
   const [inputValue, setInputValue] = useState("");
 
   useEffect(() => {
-    fetch(API_URL, {
-      headers: { "x-api-key": API_KEY },
-    }).then((res) => res.json())
+    fetch(API_URL, { headers: { "x-api-key": API_KEY }})
+      .then((res) => res.json())
       .then(setTasks)
       .catch((err) => console.error(err));
-  }), [];
+  }, []);
 
   const handleAddTask = async () => {
     if (inputValue.trim() === "") return;

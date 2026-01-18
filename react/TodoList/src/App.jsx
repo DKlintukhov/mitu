@@ -6,7 +6,7 @@ import TaskList from './TaskList.jsx';
 import './App.css';
 
 function App() {
-  const API_URL = "https://mitutodolistbackend.vercel.app:4000/api/tasks";
+  const API_URL = "https://mitu-virid.vercel.app/api/tasks";
   const API_KEY = "my-secret-key";
 
   const [tasks, setTasks] = useState([]);

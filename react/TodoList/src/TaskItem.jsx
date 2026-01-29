@@ -135,13 +135,13 @@ export default function TaskItem({ task, onDelete, onUpdate }) {
 
           <span className={`task-text ${isCompleted ? "completed-text" : ""}`}>
             {task.text}
-            {isCompleted && (
-              <span className="completion-badge">
-                <span className="badge-icon">✓</span>
-                Выполнено
-              </span>
-            )}
           </span>
+          {isCompleted && (
+            <span className="completion-badge">
+              <span className="badge-icon">✓</span>
+              Выполнено
+            </span>
+          )}
 
           <div className="task-indicators">
             {isActive && (

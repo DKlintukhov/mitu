@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import reactLogo from './assets/react.svg';
-import TaskInput from './TaskInput.jsx';
-import TaskList from './TaskList.jsx';
-import './App.css';
+import { useState, useEffect } from "react";
+import reactLogo from "./assets/react.svg";
+import TaskInput from "./TaskInput.jsx";
+import TaskList from "./TaskList.jsx";
+import "./App.css";
 
 function App() {
   const API_URL = "https://mitu-virid.vercel.app/api/tasks";
@@ -12,7 +12,7 @@ function App() {
   const [inputValue, setInputValue] = useState("");
 
   useEffect(() => {
-    fetch(API_URL, { headers: { "x-api-key": API_KEY }})
+    fetch(API_URL, { headers: { "x-api-key": API_KEY } })
       .then((res) => res.json())
       .then(setTasks)
       .catch((err) => console.error(err));
@@ -23,32 +23,32 @@ function App() {
 
     try {
       const res = await fetch(API_URL, {
-        method: 'POST',
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           "x-api-key": API_KEY,
         },
-        body: JSON.stringify({ text: inputValue })
+        body: JSON.stringify({ text: inputValue }),
       });
       const newTask = await res.json();
       setTasks((prev) => [...prev, newTask]);
-      setInputValue('');
+      setInputValue("");
     } catch (err) {
-        console.error(err);
+      console.error(err);
     }
   };
 
   const handleDeleteTask = async (id) => {
     try {
       const res = await fetch(`${API_URL}/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
           "x-api-key": API_KEY,
         },
       });
       setTasks((prev) => prev.filter((task) => task.id !== id));
     } catch (err) {
-        console.error(err);
+      console.error(err);
     }
   };
 
@@ -57,7 +57,7 @@ function App() {
 
     try {
       const res = await fetch(`${API_URL}/${id}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           "x-api-key": API_KEY,
@@ -67,7 +67,7 @@ function App() {
       const updated = await res.json();
       setTasks((prev) => prev.map((task) => (task.id === id ? updated : task)));
     } catch (err) {
-        console.error(err);
+      console.error(err);
     }
   };
 
@@ -75,20 +75,22 @@ function App() {
     <>
       <div className="App">
         <h1>Мой список дел</h1>
-        <TaskInput
-          inputValue={inputValue}
-          setInputValue={setInputValue}
-          onAddTask={handleAddTask}
-        />
-        <TaskList
-          tasks={tasks}
-          onDeleteTask={handleDeleteTask}
-          onUpdateTask={handleUpdateTask}
-        />
+        <main className="main-content">
+          <TaskInput
+            inputValue={inputValue}
+            setInputValue={setInputValue}
+            onAddTask={handleAddTask}
+          />
+          <TaskList
+            tasks={tasks}
+            onDeleteTask={handleDeleteTask}
+            onUpdateTask={handleUpdateTask}
+          />
+        </main>
         <p>Задач: {tasks.length}</p>
       </div>
     </>
-  )
+  );
 }
 
 export default App;

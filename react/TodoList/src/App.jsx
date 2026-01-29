@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import reactLogo from "./assets/react.svg";
 import TaskInput from "./TaskInput.jsx";
 import TaskList from "./TaskList.jsx";
 import "./App.css";
@@ -40,7 +39,7 @@ function App() {
 
   const handleDeleteTask = async (id) => {
     try {
-      const res = await fetch(`${API_URL}/${id}`, {
+      await fetch(`${API_URL}/${id}`, {
         method: "DELETE",
         headers: {
           "x-api-key": API_KEY,

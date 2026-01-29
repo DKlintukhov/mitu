@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-export default function TaskItem({ task, onDelete, onUpdate }) {
+export default function TaskItem({ task, onDelete, onUpdate, onComplete }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(task.text);
+  const [isActive, setIsActive] = useState(task.active || false);
+  const [isCompleted, setIsCompleted] = useState(task.completed || false);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -32,8 +34,33 @@ export default function TaskItem({ task, onDelete, onUpdate }) {
     }
   };
 
+  const handleToggleComplete = () => {
+    const newCompletedState = !isCompleted;
+    setIsCompleted(newCompletedState);
+
+    if (newCompletedState) {
+      setIsActive(false);
+    }
+
+    onComplete(task.id, newCompletedState);
+    onUpdate(task.id, task.text, newCompletedState, false);
+  };
+
+  const handleActiveToggle = () => {
+    const newActiveState = !isActive;
+    setIsActive(newActiveState);
+
+    if (newActiveState) {
+      setIsCompleted(false);
+    }
+
+    onUpdate(task.id, task.text, false, newActiveState);
+  };
+
   return (
-    <li className="task-item">
+    <li
+      className={`task-item ${isCompleted ? "task-completed" : ""} ${isActive ? "task-active" : ""}`}
+    >
       {isEditing ? (
         <div className="edit-mode">
           <input
@@ -43,7 +70,31 @@ export default function TaskItem({ task, onDelete, onUpdate }) {
             onKeyDown={handleKeyPress}
             className="edit-input"
             autoFocus
+            placeholder="Введите текст задачи..."
           />
+
+          <div className="edit-options">
+            <label className="option-checkbox">
+              <input
+                type="checkbox"
+                checked={isCompleted}
+                onChange={handleToggleComplete}
+                disabled={isActive}
+              />
+              <span>Выполнено</span>
+            </label>
+
+            <label className="option-checkbox">
+              <input
+                type="checkbox"
+                checked={isActive}
+                onChange={handleActiveToggle}
+                disabled={isCompleted}
+              />
+              <span>Активно</span>
+            </label>
+          </div>
+
           <div className="edit-buttons">
             <button onClick={handleSave} className="save-btn">
               Сохранить
@@ -55,13 +106,49 @@ export default function TaskItem({ task, onDelete, onUpdate }) {
         </div>
       ) : (
         <div className="view-mode">
-          <span className="task-text">{task.text}</span>
+          <div className="task-checkbox">
+            <input
+              type="checkbox"
+              checked={isCompleted}
+              onChange={handleToggleComplete}
+              disabled={isActive}
+              id={`task-${task.id}`}
+              className="checkbox-input"
+            />
+            <label
+              htmlFor={`task-${task.id}`}
+              className="checkbox-label"
+            ></label>
+          </div>
+
+          <span className={`task-text ${isCompleted ? "completed-text" : ""}`}>
+            {task.text}
+            {isCompleted && (
+              <span className="completion-badge">
+                <span className="badge-icon">✓</span>
+                Выполнено
+              </span>
+            )}
+          </span>
+
+          <div className="task-indicators">
+            {isActive && (
+              <span className="active-indicator" title="Активная задача">
+                🔥
+              </span>
+            )}
+          </div>
+
           <div className="task-actions">
-            <button onClick={handleEdit} className="edit-btn">
-              Редактировать
+            <button
+              onClick={handleEdit}
+              className="edit-btn"
+              disabled={isCompleted}
+            >
+              ✏️ Редактировать
             </button>
             <button onClick={() => onDelete(task.id)} className="delete-btn">
-              Удалить
+              🗑️ Удалить
             </button>
           </div>
         </div>

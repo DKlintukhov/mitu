@@ -1,9 +1,15 @@
-export default function TaskInput({inputValue, setInputValue, onAddTask}) {
+export default function TaskInput({
+  inputValue,
+  setInputValue,
+  onKeyPress,
+  onAddTask,
+}) {
   return (
     <div className="input-container">
       <input
         type="text"
         value={inputValue}
+        onKeyDown={onKeyPress}
         placeholder="Введите задачу"
         onChange={(e) => setInputValue(e.target.value)}
       />

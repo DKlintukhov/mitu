@@ -1,5 +1,3 @@
-import React from "react";
-
 const Filter = ({ currentFilter, onFilterChange }) => {
   const filters = [
     { id: "all", label: "Все" },

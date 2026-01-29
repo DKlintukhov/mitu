@@ -1,14 +1,30 @@
 import { useState, useEffect } from "react";
 import TaskInput from "./TaskInput.jsx";
 import TaskList from "./TaskList.jsx";
+import Filter from "./Filter.jsx";
 import "./App.css";
 
 function App() {
-  const API_URL = "https://mitu-virid.vercel.app/api/tasks";
+  const API_URL =
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:4000/api/tasks"
+      : "https://mitu-virid.vercel.app/api/tasks";
   const API_KEY = "my-secret-key";
 
   const [tasks, setTasks] = useState([]);
   const [inputValue, setInputValue] = useState("");
+  const [filter, setFilter] = useState("all");
+
+  const getFilteredTasks = () => {
+    switch (filter) {
+      case "active":
+        return tasks.filter((task) => task.active);
+      case "completed":
+        return tasks.filter((task) => task.completed);
+      default:
+        return tasks;
+    }
+  };
 
   useEffect(() => {
     fetch(API_URL, { headers: { "x-api-key": API_KEY } })
@@ -19,6 +35,7 @@ function App() {
 
   const handleAddTask = async () => {
     if (inputValue.trim() === "") return;
+    const task = { text: inputValue, active: false, completed: false };
 
     try {
       const res = await fetch(API_URL, {
@@ -27,7 +44,7 @@ function App() {
           "Content-Type": "application/json",
           "x-api-key": API_KEY,
         },
-        body: JSON.stringify({ text: inputValue }),
+        body: JSON.stringify({ task }),
       });
       const newTask = await res.json();
       setTasks((prev) => [...prev, newTask]);
@@ -51,20 +68,18 @@ function App() {
     }
   };
 
-  const handleUpdateTask = async (id, newText) => {
-    if (newText.trim() === "") return;
-
+  const handleUpdateTask = async (task) => {
     try {
-      const res = await fetch(`${API_URL}/${id}`, {
+      const res = await fetch(`${API_URL}/${task.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           "x-api-key": API_KEY,
         },
-        body: JSON.stringify({ text: newText }),
+        body: JSON.stringify({ task }),
       });
       const updated = await res.json();
-      setTasks((prev) => prev.map((task) => (task.id === id ? updated : task)));
+      setTasks((prev) => prev.map((el) => (el.id === task.id ? updated : el)));
     } catch (err) {
       console.error(err);
     }
@@ -80,8 +95,9 @@ function App() {
             setInputValue={setInputValue}
             onAddTask={handleAddTask}
           />
+          <Filter currentFilter={filter} onFilterChange={setFilter} />
           <TaskList
-            tasks={tasks}
+            tasks={getFilteredTasks(tasks)}
             onDeleteTask={handleDeleteTask}
             onUpdateTask={handleUpdateTask}
           />

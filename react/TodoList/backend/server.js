@@ -19,39 +19,39 @@ const checkApiKey = (req, res, next) => {
   next();
 };
 
-app.use('/api/tasks', checkApiKey);
+app.use("/api/tasks", checkApiKey);
 
 let tasks = [];
 let nextId = 1;
 
-app.get('/api/tasks', async (req, res) => {
+app.get("/api/tasks", async (req, res) => {
   console.log("GET /api/tasks");
   try {
     res.json(tasks);
-  } catch(err) {
+  } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Ошибка при запросе к API" });
   }
 });
 
-app.post('/api/tasks', async (req, res) => {
+app.post("/api/tasks", async (req, res) => {
   console.log("POST /api/tasks", req.body);
   try {
-    const { text } = req.body;
+    const { task } = req.body;
     const newTask = {
       id: nextId++,
-      text: text.trim()
+      ...task,
     };
 
     tasks.push(newTask);
     res.status(201).json(newTask);
-  } catch(err) {
+  } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Ошибка при создании задачи" });
   }
 });
 
-app.delete('/api/tasks/:id', async (req, res) => {
+app.delete("/api/tasks/:id", async (req, res) => {
   console.log(`DELETE /api/tasks/${req.params.id}`);
   try {
     const id = parseInt(req.params.id);
@@ -64,26 +64,26 @@ app.delete('/api/tasks/:id', async (req, res) => {
     }
 
     res.status(204).send();
-  } catch(err) {
+  } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Ошибка при удалении задачи" });
   }
 });
 
-app.put('/api/tasks/:id', async (req, res) => {
+app.put("/api/tasks/:id", async (req, res) => {
   console.log(`PUT /api/tasks/${req.params.id}`, req.body);
   try {
     const id = parseInt(req.params.id);
-    const { text } = req.body;
+    const { task } = req.body;
 
     const taskIdx = tasks.findIndex((task) => task.id === id);
     if (taskIdx === -1) {
       return res.status(404).json({ error: "Задача не найдена" });
     }
 
-    tasks[taskIdx].text = text.trim();
+    tasks[taskIdx] = task;
     res.json(tasks[taskIdx]);
-  } catch(err) {
+  } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Ошибка при обновлении задачи" });
   }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function TaskItem({ task, onDelete, onUpdate, onComplete }) {
+export default function TaskItem({ task, onDelete, onUpdate }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(task.text);
   const [isActive, setIsActive] = useState(task.active || false);
@@ -17,7 +17,12 @@ export default function TaskItem({ task, onDelete, onUpdate, onComplete }) {
       return;
     }
 
-    onUpdate(task.id, editText);
+    onUpdate({
+      ...task,
+      text: editText,
+      completed: isCompleted,
+      active: isActive,
+    });
     setIsEditing(false);
   };
 
@@ -42,8 +47,11 @@ export default function TaskItem({ task, onDelete, onUpdate, onComplete }) {
       setIsActive(false);
     }
 
-    onComplete(task.id, newCompletedState);
-    onUpdate(task.id, task.text, newCompletedState, false);
+    onUpdate({
+      ...task,
+      completed: newCompletedState,
+      active: newCompletedState ? false : task.active,
+    });
   };
 
   const handleActiveToggle = () => {
@@ -54,7 +62,11 @@ export default function TaskItem({ task, onDelete, onUpdate, onComplete }) {
       setIsCompleted(false);
     }
 
-    onUpdate(task.id, task.text, false, newActiveState);
+    onUpdate({
+      ...task,
+      active: newActiveState,
+      completed: newActiveState ? false : task.completed,
+    });
   };
 
   return (

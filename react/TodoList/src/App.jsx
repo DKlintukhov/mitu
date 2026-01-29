@@ -14,6 +14,8 @@ function App() {
   const [tasks, setTasks] = useState([]);
   const [inputValue, setInputValue] = useState("");
   const [filter, setFilter] = useState("all");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const getFilteredTasks = () => {
     switch (filter) {
@@ -27,17 +29,37 @@ function App() {
   };
 
   useEffect(() => {
-    fetch(API_URL, { headers: { "x-api-key": API_KEY } })
-      .then((res) => res.json())
-      .then(setTasks)
-      .catch((err) => console.error(err));
+    loadTasks();
   }, []);
 
+  const loadTasks = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(API_URL, { headers: { "x-api-key": API_KEY } });
+
+      if (!res.ok) {
+        throw new Error(`Ошибка ${res.status}: ${res.statusText}`);
+      }
+
+      const data = await res.json();
+      setTasks(data);
+    } catch (err) {
+      setError(`Ошибка загрузки: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleAddTask = async () => {
-    if (inputValue.trim() === "") return;
+    if (inputValue.trim() === "") {
+      setError("Введите текст задачи");
+      return;
+    }
+
     const task = { text: inputValue, active: false, completed: false };
 
     try {
+      setError("");
       const res = await fetch(API_URL, {
         method: "POST",
         headers: {
@@ -46,30 +68,42 @@ function App() {
         },
         body: JSON.stringify({ task }),
       });
+
+      if (!res.ok) {
+        throw new Error(`Ошибка ${res.status}: ${res.statusText}`);
+      }
+
       const newTask = await res.json();
       setTasks((prev) => [...prev, newTask]);
       setInputValue("");
     } catch (err) {
-      console.error(err);
+      setError(`Ошибка добавления: ${err.message}`);
     }
   };
 
   const handleDeleteTask = async (id) => {
     try {
-      await fetch(`${API_URL}/${id}`, {
+      setError("");
+      const res = await fetch(`${API_URL}/${id}`, {
         method: "DELETE",
         headers: {
           "x-api-key": API_KEY,
         },
       });
+
+      if (!res.ok) {
+        throw new Error(`Ошибка ${res.status}: ${res.statusText}`);
+      }
+
       setTasks((prev) => prev.filter((task) => task.id !== id));
     } catch (err) {
-      console.error(err);
+      setError(`Ошибка удаления: ${err.message}`);
     }
   };
 
   const handleUpdateTask = async (task) => {
     try {
+      setError("");
       const res = await fetch(`${API_URL}/${task.id}`, {
         method: "PUT",
         headers: {
@@ -78,31 +112,66 @@ function App() {
         },
         body: JSON.stringify({ task }),
       });
+
+      if (!res.ok) {
+        throw new Error(`Ошибка ${res.status}: ${res.statusText}`);
+      }
+
       const updated = await res.json();
       setTasks((prev) => prev.map((el) => (el.id === task.id ? updated : el)));
     } catch (err) {
-      console.error(err);
+      setError(`Ошибка обновления: ${err.message}`);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleAddTask();
     }
   };
 
   return (
     <>
       <div className="App">
-        <h1>Мой список дел</h1>
+        <header>
+          <h1>Мой список дел</h1>
+        </header>
         <main className="main-content">
           <TaskInput
             inputValue={inputValue}
             setInputValue={setInputValue}
+            onKeyPress={handleKeyPress}
             onAddTask={handleAddTask}
           />
           <Filter currentFilter={filter} onFilterChange={setFilter} />
-          <TaskList
-            tasks={getFilteredTasks(tasks)}
-            onDeleteTask={handleDeleteTask}
-            onUpdateTask={handleUpdateTask}
-          />
+          {loading ? (
+            <div className="loading">
+              <div className="spinner"></div>
+              <p>Загрузка...</p>
+            </div>
+          ) : (
+            <TaskList
+              tasks={getFilteredTasks()}
+              onDeleteTask={handleDeleteTask}
+              onUpdateTask={handleUpdateTask}
+            />
+          )}
         </main>
-        <p>Задач: {tasks.length}</p>
+        <footer className="footer">
+          <p>Задач: {tasks.length}</p>
+          {error && (
+            <div className="error-message">
+              <span>{error}</span>
+              <button
+                onClick={() => setError("")}
+                className="error-close"
+                title="Закрыть"
+              >
+                ×
+              </button>
+            </div>
+          )}
+        </footer>
       </div>
     </>
   );

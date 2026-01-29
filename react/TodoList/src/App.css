@@ -382,6 +382,76 @@ button:disabled {
     border: 1px solid #eee;
 }
 
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    margin: 20px 0;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #2196f3;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+    min-height: 40px;
+}
+
+.error-message {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border-left: 3px solid #c62828;
+    font-size: 14px;
+}
+
+.error-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #c62828;
+    cursor: pointer;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.error-close:hover {
+    background-color: rgba(198, 40, 40, 0.1);
+}
+
 @media (max-width: 640px) {
     .App {
         margin: 20px;
@@ -440,6 +510,17 @@ button:disabled {
 
     .filter-btn {
         width: 100%;
+    }
+
+    .footer {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .error-message {
+        width: 100%;
+        justify-content: space-between;
     }
 }
 
